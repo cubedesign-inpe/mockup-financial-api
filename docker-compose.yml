@@ -1,9 +1,9 @@
 version: '3'
 services:
-  postgres:
+  pg-data:
     image: postgres:latest
     ports:
-      - "5432:5432"
+      - "3306:5432"
     volumes:
       - mockup-financial-db:/data/db
     environment:
