@@ -1,0 +1,56 @@
+// https://dbdiagram.io/d/5d2baa1aced98361d6dca475
+
+Table orders {
+  id int [pk]
+  user_id int [ref: > users.id, not null]
+  team_id int [ref: > teams.id, not null]
+  price_penality float
+  total float
+  status varchar
+  created_at timestamp [not null]
+  created_by int [ref: > users.id, not null]
+}
+
+Table order_items {
+  order_id int [ref: > orders.id]
+  product_id int [ref: > products.id]
+  quantity int
+}
+
+Table products {
+  id int [pk]
+  name varchar
+  picture varchar
+  base_price int
+  status varchar
+  created_at timestamp [not null]
+  created_by int [ref: > users.id, not null]
+}
+
+Table users {
+  id int [pk]
+  username varchar [unique, not null]
+  email varchar [unique, not null]
+  full_name varchar
+  password varchar
+  created_at timestamp [not null]
+}
+
+Table teams {
+  id int [pk]
+  name varchar
+  total float // ??? Not sure
+  created_at timestamp [not null]
+  created_by int [ref: > users.id, not null]
+}
+
+// No need for account-to-account. just give directly
+Table transactions {
+  id int [pk]
+  teams_id int [ref: > teams.id, not null]
+  delta float [not null]
+  order_id int [ref: > orders.id]
+  created_at timestamp [not null]
+  created_by int [ref: > users.id, not null]
+}
+
