@@ -21,5 +21,22 @@ Route.get('/', () => {
 })
 
 Route.post('/users', 'UserController.create')
+/*Route.resource('users', 'UserController')
+  .apiOnly()
+  .middleware(new Map([[['users.update', 'users.delete'], ['auth']]]))
+  */
+// Double map? Why?
 Route.post('/sessions', 'SessionController.create')
 
+Route.resource('teams', 'TeamController')
+  .apiOnly()
+  .middleware('auth')
+Route.resource('teams.orders', 'OrderController')
+  .apiOnly()
+  .middleware('auth')
+Route.resource('teams.transactions', 'TransactionController')
+  .apiOnly()
+  .middleware('auth')
+Route.resource('products', 'ProductController')
+  .apiOnly()
+  .middleware('auth')

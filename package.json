@@ -1,8 +1,8 @@
 {
-  "name": "adonis-api-app",
-  "version": "4.1.0",
+  "name": "Mockup-API",
+  "version": "0.0.1",
   "adonis-version": "4.1.0",
-  "description": "Adonisjs boilerplate for API server with pre-configured JWT",
+  "description": "CubeDesign competition Mockup API",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
@@ -12,8 +12,8 @@
     "adonisjs",
     "adonis-app"
   ],
-  "author": "",
-  "license": "UNLICENSED",
+  "author": "Yuri-M-Dias",
+  "license": "MIT",
   "private": true,
   "dependencies": {
     "@adonisjs/ace": "^5.0.8",
@@ -24,9 +24,12 @@
     "@adonisjs/framework": "^5.0.9",
     "@adonisjs/ignitor": "^2.0.8",
     "@adonisjs/lucid": "^6.1.3",
+    "@adonisjs/vow": "^1.0.17",
     "pg": "^7.11.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^6.0.1"
+  },
   "autoload": {
     "App": "./app"
   }
