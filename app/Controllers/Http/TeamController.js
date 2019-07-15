@@ -31,7 +31,11 @@ class TeamController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {}
+  async store({ request, response }) {
+    const data = request.only(['name', 'total'])
+    const team = await Team.create(data)
+    return team
+  }
 
   /**
    * Display a single team.
@@ -42,7 +46,12 @@ class TeamController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params, request, response, view }) {}
+  async show({ params, request, response, view }) {
+    const team = await Team.findOrFail(params.id)
+    await team.load('orders')
+    await team.load('transactions')
+    return team
+  }
 
   /**
    * Update team details.
@@ -52,7 +61,10 @@ class TeamController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params, request, response }) {}
+  async update({ params, request, response }) {
+    const team = await Team.findOrFail(params.id)
+    //LOG?
+  }
 
   /**
    * Delete a team with id.
@@ -62,7 +74,11 @@ class TeamController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params, request, response }) {}
+  async destroy({ params, request, response }) {
+    const team = await Team.findOrFail(params.id)
+    //LOG?
+    return await team.delete()
+  }
 }
 
 module.exports = TeamController
