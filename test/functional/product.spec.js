@@ -36,6 +36,35 @@ test('can create product', async ({ client, assert }) => {
   })
 })
 
+test('can edit a product', async ({ client, assert }) => {
+  const user = await User.find(1)
+  const testProduct = {
+    name: 'testtproduct',
+    base_price: 20,
+  }
+  const response = await client
+    .post('products')
+    .send(testProduct)
+    .loginVia(user, 'jwt')
+    .end()
+  response.assertStatus(200)
+  let createdID = response.body.id;
+  let createdProduct = await Product.findBy('id', createdID)
+  response.assertJSONSubset({
+    name: createdProduct.name,
+    base_price: createdProduct.base_price,
+  })
+  testProduct.base_price = 50
+  const responseEdit = await client
+    .put(`products/${createdID}`)
+    .send(testProduct)
+    .loginVia(user, 'jwt')
+    .end()
+  responseEdit.assertStatus(200)
+  createdProduct = await Product.findBy('id', createdID)
+  assert.equal(testProduct.base_price, createdProduct.base_price, "Base price not changed")
+})
+
 test('can delete a product', async ({ client, assert }) => {
   const user = await User.find(1)
   const testProduct = {

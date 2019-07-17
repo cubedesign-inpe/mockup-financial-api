@@ -61,7 +61,10 @@ class ProductController {
    */
   async update({ params, request, response }) {
     const product = await Product.findOrFail(params.id)
-    return product
+    const data = request.only(['name', 'base_price'])
+    //SANITIZE
+    product.merge(data)
+    return await product.save()
   }
 
   /**
