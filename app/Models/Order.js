@@ -9,8 +9,10 @@ class Order extends BaseModel {
   transaction() {
     return this.belongsTo('App/Models/Transaction')
   }
-  items() {
-    return this.hasMany('App/Models/OrderItem')
+  products() {
+    return this.belongsToMany('App/Models/Product').pivotModel(
+      'App/Models/OrderProduct'
+    )
   }
 }
 

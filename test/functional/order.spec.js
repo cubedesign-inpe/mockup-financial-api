@@ -66,11 +66,35 @@ test('can delete an order', async ({ client, assert }) => {
   assert.isNull(createdOrder)
 })
 
+test('cannot create order without products ids', async ({ client, assert }) => {
+  const shoppingCart = {
+    products: null,
+    price_penalty: 1,
+  }
+  const response = await client
+    .post(`teams/${team.id}/orders`)
+    .send(shoppingCart)
+    .loginVia(user, 'jwt')
+    .end()
+  response.assertStatus(400)
+  response.assertJSONSubset([
+    {
+      message: 'You must provide the products.',
+      field: 'products',
+    },
+  ])
+})
+
 test('can create order from products', async ({ client, assert }) => {
   const products = await Factory.model('App/Models/Product').createMany(3)
+  const cartProducts = products.map(product => {
+    return {
+      id: product.id,
+      quantity: 2,
+    }
+  })
   const shoppingCart = {
-    team_id: team.id,
-    products_ids: products.map(_ => _.id),
+    products: cartProducts,
     price_penalty: 1,
   }
   const response = await client
@@ -81,7 +105,7 @@ test('can create order from products', async ({ client, assert }) => {
   console.log('Error', response.error)
   response.assertStatus(200)
   const createdOrder = await Order.findBy('id', response.body.id)
-  const expectedTotal = products.reduce((acc, _) => acc + _.base_price)
+  const expectedTotal = products.reduce((acc, _) => acc + _.base_price, 0)
   response.assertJSONSubset({
     price_penalty: createdOrder.price_penalty,
     total: expectedTotal,
@@ -91,4 +115,33 @@ test('can create order from products', async ({ client, assert }) => {
     createdOrder.total,
     'Not making the correct sum to total'
   )
+})
+
+test('can get order with bought products', async ({ client, assert }) => {
+  const products = await Factory.model('App/Models/Product').createMany(3)
+  const cartProducts = products.map(product => {
+    return {
+      id: product.id,
+      quantity: 2,
+    }
+  })
+  const shoppingCart = {
+    products: cartProducts,
+    price_penalty: 1,
+  }
+  const response = await client
+    .post(`teams/${team.id}/orders`)
+    .send(shoppingCart)
+    .loginVia(user, 'jwt')
+    .end()
+  response.assertStatus(200)
+  const showCartResponse = await client
+    .get(`teams/${team.id}/orders/${response.body.id}`)
+    .loginVia(user, 'jwt')
+    .end()
+  console.log('Error', response.error)
+  showCartResponse.assertStatus(200)
+  showCartResponse.assertJSONSubset({
+    products: null,
+  })
 })

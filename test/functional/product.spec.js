@@ -25,7 +25,7 @@ test('can index products', async ({ client, assert }) => {
     .end()
   response.assertStatus(200)
   // This test is not testing anything.
-  assert.isAbove(
+  assert.isAtLeast(
     response.body.length,
     products.length,
     'Did not return the minimum of products'

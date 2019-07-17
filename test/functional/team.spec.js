@@ -24,7 +24,7 @@ test('can index teams', async ({ client, assert }) => {
     .loginVia(user, 'jwt')
     .end()
   response.assertStatus(200)
-  assert.isAbove(
+  assert.isAtLeast(
     response.body.length,
     teams.length,
     'Did not return the minimum of teams'

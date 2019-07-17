@@ -15,7 +15,7 @@ Factory.blueprint('App/Models/User', async faker => {
 
 Factory.blueprint('App/Models/Team', async faker => {
   return {
-    name: faker.company(),
+    name: faker.guid(),
     total: 400,
   }
 })
@@ -35,7 +35,7 @@ Factory.blueprint('App/Models/Order', async (faker, i, data) => {
   }
 })
 
-Factory.blueprint('App/Models/OrderItem', async (faker, i, data) => {
+Factory.blueprint('App/Models/OrderProduct', async (faker, i, data) => {
   return {
     team_id: data.team_id,
     order_id: data.order_id,

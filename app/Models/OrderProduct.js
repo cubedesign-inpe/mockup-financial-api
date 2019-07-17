@@ -2,7 +2,7 @@
 
 const BaseModel = use('App/Models/BaseModel')
 
-class OrderItem extends BaseModel {
+class OrderProduct extends BaseModel {
   order() {
     return this.belongsTo('App/Models/Order')
   }
@@ -11,4 +11,4 @@ class OrderItem extends BaseModel {
   }
 }
 
-module.exports = OrderItem
+module.exports = OrderProduct
