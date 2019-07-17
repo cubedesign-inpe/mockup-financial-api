@@ -31,9 +31,10 @@ class ProductController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {
+  async store({ request, response, auth }) {
+    const { user_id } = await auth.getUser()
     const data = request.only(['name', 'base_price'])
-    const product = await Product.create(data)
+    const product = await Product.create({ ...data, created_by: user_id })
     return product
   }
 
@@ -46,7 +47,7 @@ class ProductController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params, request, response, view }) {
+  async show({ params, request, response }) {
     const product = await Product.findOrFail(params.id)
     return product
   }
@@ -62,7 +63,7 @@ class ProductController {
   async update({ params, request, response }) {
     const product = await Product.findOrFail(params.id)
     const data = request.only(['name', 'base_price'])
-    //SANITIZE
+    //TODO: SANITIZE
     product.merge(data)
     return await product.save()
   }
@@ -77,7 +78,8 @@ class ProductController {
    */
   async destroy({ params, request, response }) {
     const product = await Product.findOrFail(params.id)
-    return await product.delete()
+    await product.delete()
+    return response.nocontent()
   }
 }
 

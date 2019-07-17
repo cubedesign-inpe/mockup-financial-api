@@ -31,9 +31,10 @@ class TeamController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {
+  async store({ request, response, auth }) {
+    const user = await auth.getUser()
     const data = request.only(['name', 'total'])
-    const team = await Team.create(data)
+    const team = await Team.create({ ...data, created_by: user.id })
     return team
   }
 

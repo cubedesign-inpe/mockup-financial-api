@@ -16,10 +16,12 @@ class OrderController {
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
-   * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
-    const orders = Order.all()
+  async index({ params, request, response }) {
+    const { team_id } = params
+    const orders = await Order.query()
+      .where('team_id', '=', team_id)
+      .fetch()
     return orders
   }
 
@@ -31,8 +33,8 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
-    // TODO
+  async store({ params, request, response }) {
+    const { team_id } = params
     const data = request.only(['name', 'total'])
     const order = await Order.create(data)
     return order
@@ -47,7 +49,7 @@ class OrderController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show({ params, request, response, view }) {
     const order = await Order.findOrFail(params.id)
     return order
   }
@@ -60,7 +62,7 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update({ params, request, response }) {
     const order = await Order.findOrFail(params.id)
     return order
   }
@@ -73,7 +75,7 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy({ params, request, response }) {
     const order = await Order.findOrFail(params.id)
     return await order.delete()
   }

@@ -1,18 +1,5 @@
 'use strict'
 
-/*
-|--------------------------------------------------------------------------
-| Routes
-|--------------------------------------------------------------------------
-|
-| Http routes are entry points to your web application. You can create
-| routes for different URLs and bind Controller actions to them.
-|
-| A complete guide on routing is available here.
-| http://adonisjs.com/docs/4.1/routing
-|
-*/
-
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
@@ -21,22 +8,27 @@ Route.get('/', () => {
 })
 
 Route.post('/users', 'UserController.create')
-/*Route.resource('users', 'UserController')
+//TODO: api?
+/*
+Route.resource('users', 'UserController')
   .apiOnly()
-  .middleware(new Map([[['users.update', 'users.delete'], ['auth']]]))
+  .middleware(
+    new Map([
+      [['users.index', 'users.show', 'users.update', 'users.delete'], ['auth']],
+    ])
+  )
   */
-// Double map? Why?
+
 Route.post('/sessions', 'SessionController.create')
 
-Route.resource('teams', 'TeamController')
-  .apiOnly()
-  .middleware('auth')
-Route.resource('/teams/:teamid/orders', 'OrderController')
-  .apiOnly()
-  .middleware('auth')
-Route.resource('/teams/:teamid/transactions', 'TransactionController')
-  .apiOnly()
-  .middleware('auth')
-Route.resource('products', 'ProductController')
-  .apiOnly()
+Route.group(() => {
+  Route.resource('teams', 'TeamController').apiOnly()
+  Route.resource('/teams/:team_id/orders', 'OrderController').apiOnly()
+  Route.resource(
+    '/teams/:team_id/transactions',
+    'TransactionController'
+  ).apiOnly()
+  Route.resource('products', 'ProductController').apiOnly()
+})
+  .formats(['json'])
   .middleware('auth')
