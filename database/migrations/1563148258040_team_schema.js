@@ -11,7 +11,7 @@ class TeamSchema extends Schema {
         .text('name')
         .notNullable()
         .unique()
-      table.float('total')
+      table.float('total').notNullable()
       table.timestamps()
       table
         .integer('created_by')

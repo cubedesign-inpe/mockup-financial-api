@@ -4,7 +4,7 @@
 const Factory = use('Factory')
 
 class TeamSeeder {
-  async run () {
+  async run() {
     const createdTeams = await Factory.model('App/Models/Team').createMany(3)
   }
 }

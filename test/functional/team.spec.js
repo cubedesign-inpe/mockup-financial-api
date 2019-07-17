@@ -1,63 +1,75 @@
 'use strict'
 
-const { test, trait } = use('Test/Suite')('Team')
+const { before, beforeEach, after, afterEach, test, trait } = use('Test/Suite')(
+  'Team'
+)
+const Factory = use('Factory')
+
 const Team = use('App/Models/Team')
-const User = use('App/Models/User')
 
 trait('Test/ApiClient')
 trait('Auth/Client')
 trait('DatabaseTransactions')
 
+let user = null
+
+beforeEach(async () => {
+  user = await Factory.model('App/Models/User').create()
+})
+
 test('can index teams', async ({ client, assert }) => {
-  const user = await User.find(1)
+  const teams = await Factory.model('App/Models/Team').makeMany(4)
   const response = await client
-    .get('teams')
+    .get(`teams`)
     .loginVia(user, 'jwt')
     .end()
   response.assertStatus(200)
+  assert.isAbove(
+    response.body.length,
+    teams.length,
+    'Did not return the minimum of teams'
+  )
 })
 
-test('can create team', async ({ client, assert }) => {
-  const user = await User.find(1)
-  const testTeam = {
-    name: 'testtteam',
-    total: 100,
-  }
+test('can get team detail', async ({ client, assert }) => {
+  const team = await Factory.model('App/Models/Team').create()
   const response = await client
-    .post('teams')
-    .send(testTeam)
+    .get(`teams/${team.id}`)
     .loginVia(user, 'jwt')
     .end()
   response.assertStatus(200)
-  const createdTeam = await Team.findBy('id', response.body.id)
   response.assertJSONSubset({
-    name: createdTeam.name,
-    total: createdTeam.total,
+    name: team.name,
+    total: team.total,
   })
 })
 
-test('can delete a team', async ({ client, assert }) => {
-  const user = await User.find(1)
-  const testTeam = {
-    name: 'testtteam',
-    total: 100,
-  }
-  const response = await client
-    .post('teams')
-    .send(testTeam)
-    .loginVia(user, 'jwt')
-    .end()
-  response.assertStatus(200)
-  let createdTeam = await Team.findBy('id', response.body.id)
-  response.assertJSONSubset({
-    name: createdTeam.name,
-    total: createdTeam.total,
-  })
+test('can delete an team', async ({ client, assert }) => {
+  const team = await Factory.model('App/Models/Team').create()
   const deletion = await client
-    .delete(`teams/${response.body.id}`)
+    .delete(`teams/${team.id}`)
     .loginVia(user, 'jwt')
     .end()
   deletion.assertStatus(200)
-  createdTeam = await Team.findBy('id', response.body.id)
+  let createdTeam = await Team.findBy('id', team.id)
   assert.isNull(createdTeam)
+})
+
+test('can update team name', async ({ client, assert }) => {
+  const team = await Factory.model('App/Models/Team').create()
+  const teamChanges = {
+    name: 'Biscuit',
+  }
+  const response = await client
+    .put(`teams/${team.id}`)
+    .send(teamChanges)
+    .loginVia(user, 'jwt')
+    .end()
+  response.assertStatus(200)
+  const updatedTeam = await Team.findBy('id', team.id)
+  assert.equal(
+    updatedTeam.name,
+    teamChanges.name,
+    "Team total isn't being updated"
+  )
 })

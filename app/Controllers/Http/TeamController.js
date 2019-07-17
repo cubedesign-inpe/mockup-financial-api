@@ -64,7 +64,10 @@ class TeamController {
    */
   async update({ params, request, response }) {
     const team = await Team.findOrFail(params.id)
-    //LOG?
+    const data = request.only(['name'])
+    //TODO: SANITIZE
+    team.merge(data)
+    return await team.save()
   }
 
   /**

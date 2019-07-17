@@ -10,7 +10,9 @@ module.exports = (cli, runner) => {
   })
 
   runner.after(async () => {
-    use('Adonis/Src/Server').getInstance().close()
+    use('Adonis/Src/Server')
+      .getInstance()
+      .close()
     await ace.call('migration:reset', {}, { silent: true })
   })
 }

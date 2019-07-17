@@ -20,7 +20,7 @@ class TransactionSchema extends Schema {
         .unsigned()
         .references('id')
         .inTable('orders')
-        .notNullable()
+        .onDelete('CASCADE')
       table.timestamps()
       table
         .integer('created_by')

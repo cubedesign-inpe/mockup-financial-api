@@ -13,7 +13,6 @@ trait('Test/ApiClient')
 trait('Auth/Client')
 trait('DatabaseTransactions')
 
-// Reuse variables
 let user = null
 let team = null
 
@@ -39,81 +38,57 @@ test('can index orders', async ({ client, assert }) => {
   ])
 })
 
-test('can create order', async ({ client, assert }) => {
+test('can get order detail', async ({ client, assert }) => {
   const order = await Factory.model('App/Models/Order').make({
     team_id: team.id,
   })
-  team.orders().save(order)
-  const testOrder = {
-    name: 'testtorder',
-    base_price: 20,
-  }
+  await team.orders().save(order)
   const response = await client
-    .post('orders')
-    .send(testOrder)
+    .get(`teams/${team.id}/orders/${order.id}`)
     .loginVia(user, 'jwt')
     .end()
   response.assertStatus(200)
-  const createdOrder = await Order.findBy('id', response.body.id)
   response.assertJSONSubset({
-    name: createdOrder.name,
-    base_price: createdOrder.base_price,
+    team_id: order.team_id,
   })
 })
 
-test('can edit a order', async ({ client, assert }) => {
-  const testOrder = {
-    name: 'testtorder',
-    base_price: 20,
-  }
-  const response = await client
-    .post('orders')
-    .send(testOrder)
-    .loginVia(user, 'jwt')
-    .end()
-  response.assertStatus(200)
-  let createdID = response.body.id
-  let createdOrder = await Order.findBy('id', createdID)
-  response.assertJSONSubset({
-    name: createdOrder.name,
-    base_price: createdOrder.base_price,
-  })
-  testOrder.base_price = 50
-  const responseEdit = await client
-    .put(`orders/${createdID}`)
-    .send(testOrder)
-    .loginVia(user, 'jwt')
-    .end()
-  responseEdit.assertStatus(200)
-  createdOrder = await Order.findBy('id', createdID)
-  assert.equal(
-    testOrder.base_price,
-    createdOrder.base_price,
-    'Base price not changed'
-  )
-})
-
-test('can delete a order', async ({ client, assert }) => {
-  const testOrder = {
-    name: 'testtorder',
-    base_price: 20,
-  }
-  const response = await client
-    .post('orders')
-    .send(testOrder)
-    .loginVia(user, 'jwt')
-    .end()
-  response.assertStatus(200)
-  let createdOrder = await Order.findBy('id', response.body.id)
-  response.assertJSONSubset({
-    name: createdOrder.name,
-    base_price: createdOrder.base_price,
+test('can delete an order', async ({ client, assert }) => {
+  const order = await Factory.model('App/Models/Order').create({
+    team_id: team.id,
   })
   const deletion = await client
-    .delete(`orders/${response.body.id}`)
+    .delete(`teams/${team.id}/orders/${order.id}`)
     .loginVia(user, 'jwt')
     .end()
   deletion.assertStatus(200)
-  createdOrder = await Order.findBy('id', response.body.id)
+  let createdOrder = await Order.findBy('id', order.id)
   assert.isNull(createdOrder)
+})
+
+test('can create order from products', async ({ client, assert }) => {
+  const products = await Factory.model('App/Models/Product').createMany(3)
+  const shoppingCart = {
+    team_id: team.id,
+    products_ids: products.map(_ => _.id),
+    price_penalty: 1,
+  }
+  const response = await client
+    .post(`teams/${team.id}/orders`)
+    .send(shoppingCart)
+    .loginVia(user, 'jwt')
+    .end()
+  console.log('Error', response.error)
+  response.assertStatus(200)
+  const createdOrder = await Order.findBy('id', response.body.id)
+  const expectedTotal = products.reduce((acc, _) => acc + _.base_price)
+  response.assertJSONSubset({
+    price_penalty: createdOrder.price_penalty,
+    total: expectedTotal,
+  })
+  assert.equal(
+    expectedTotal,
+    createdOrder.total,
+    'Not making the correct sum to total'
+  )
 })

@@ -4,8 +4,10 @@
 const Factory = use('Factory')
 
 class ProductSeeder {
-  async run () {
-    const createdProducts = await Factory.model('App/Models/Product').createMany(10)
+  async run() {
+    const createdProducts = await Factory.model(
+      'App/Models/Product'
+    ).createMany(5)
   }
 }
 
