@@ -1,6 +1,6 @@
 'use strict'
 
-class User {
+class StoreUser {
   get rules() {
     return {
       email: 'required|email|unique:users',
@@ -20,7 +20,7 @@ class User {
   }
   get sanitizationRules() {
     return {
-      email: 'normalize_email',
+      email: 'trim',
       username: 'trim',
     }
   }
@@ -32,4 +32,4 @@ class User {
   }
 }
 
-module.exports = User
+module.exports = StoreUser

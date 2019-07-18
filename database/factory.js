@@ -4,12 +4,13 @@
 const Factory = use('Factory')
 const Hash = use('Hash')
 
-Factory.blueprint('App/Models/User', async faker => {
+Factory.blueprint('App/Models/User', async (faker, i, data) => {
+  const tmpPassword = data.password || faker.password()
   return {
     username: faker.username(),
     full_name: faker.name(),
-    email: faker.email(),
-    password: await Hash.make(faker.password()),
+    email: data.email || faker.email(),
+    password: await Hash.make(tmpPassword),
   }
 })
 

@@ -7,7 +7,11 @@ Route.get('/', () => {
   return { greeting: 'Hello world in JSON' }
 })
 
-Route.post('/users', 'UserController.create').validator('User')
+Route.post('/sessions', 'SessionController.create').formats(['json'])
+
+Route.post('/users', 'UserController.create')
+  .validator('StoreUser')
+  .formats(['json'])
 //TODO: api control?
 /*
 Route.resource('users', 'UserController')
@@ -18,8 +22,6 @@ Route.resource('users', 'UserController')
     ])
   )
   */
-
-Route.post('/sessions', 'SessionController.create')
 
 Route.group(() => {
   Route.resource('teams', 'TeamController').apiOnly()

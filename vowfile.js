@@ -12,6 +12,6 @@ module.exports = (cli, runner) => {
     use('Adonis/Src/Server')
       .getInstance()
       .close()
-    await ace.call('migration:reset', {}, { silent: true })
+    //await ace.call('migration:reset', {}, { silent: false })
   })
 }
