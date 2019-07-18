@@ -1,6 +1,6 @@
 {
   "name": "Mockup-API",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "adonis-version": "4.1.0",
   "description": "CubeDesign competition Mockup API",
   "main": "index.js",
