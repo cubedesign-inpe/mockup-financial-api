@@ -36,14 +36,14 @@ class TransactionController {
    * @param {Response} ctx.response
    */
   async store({ params, request, response, auth }) {
-    const { user_id } = await auth.getUser()
+    const user = await auth.getUser()
     const { team_id } = params
     const data = request.only(['delta'])
     const team = await Team.findOrFail(team_id)
     const transaction = await Transaction.create({
       ...data,
       team_id: team.id,
-      created_by: user_id,
+      created_by: user.id,
     })
     team.total += data.delta
     await team.save()

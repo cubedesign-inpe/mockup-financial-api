@@ -3,11 +3,14 @@
 const BaseModel = use('App/Models/BaseModel')
 
 class OrderProduct extends BaseModel {
-  order() {
-    return this.belongsTo('App/Models/Order')
+  static get updatedAtColumn() {
+    return 'updated_at'
   }
-  product() {
-    return this.belongsTo('App/Models/Product')
+  static get createdAtColumn() {
+    return 'created_at'
+  }
+  getQuantity(quantity) {
+    return quantity
   }
 }
 

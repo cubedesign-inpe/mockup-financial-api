@@ -23,7 +23,7 @@ class OrderController {
   async index({ params, request, response }) {
     const { team_id } = params
     const orders = await Order.query()
-      .where('team_id', '=', team_id)
+      .where({ team_id: team_id })
       .fetch()
     return orders
   }
@@ -38,39 +38,40 @@ class OrderController {
    */
   async store({ params, request, response, auth }) {
     //Why are there no services in this framework?
-    const { user_id } = await auth.getUser()
+    const user = await auth.getUser()
     const { team_id } = params
     const data = request.only(['products', 'price_penalty'])
     const team = await Team.findOrFail(team_id)
     const product_ids = data.products.map(_ => _.id)
-    let products = await Product.query()
+    const productsDb = await Product.query()
       .select('id', 'name', 'base_price')
       .whereIn('id', product_ids)
       .fetch()
-    products = products.toJSON()
+    let products = productsDb.toJSON()
+    if (products.length === 0 || products.legnth < product_ids) {
+      return response
+        .status(400)
+        .json({ error: 'All products must have valid ids' })
+    }
     const pricePenalty = data.price_penalty
-    const orderTotal = products.reduce(
-      (agg, _) => agg + _.base_price * pricePenalty,
-      0
-    )
+    const orderTotal = products.reduce((agg, _) => {
+      const productCart = data.products.find(p => p.id == _.id)
+      return agg + _.base_price * pricePenalty * productCart.quantity
+    }, 0)
     const order = await Order.create({
       price_penalty: pricePenalty,
       total: orderTotal,
       team_id: team.id,
-      created_by: user_id,
+      created_by: user.id,
     })
-    // Holy shit
-    const productsQuantities = await Promise.all(
-      data.products.map(async _ => {
-        return await OrderProduct.create({
-          product_id: _.id,
-          order_id: order.id,
-          quantity: _.quantity,
-        })
-      })
-    )
+    await order.products().attach(products.map(_ => _.id), row => {
+      const productDetail = data.products.find(_ => _.id == row.product_id)
+      row.quantity = productDetail.quantity
+    })
     team.total -= order.total
     await team.save()
+    //Service logic
+    await order.load('products')
     return order
   }
 
@@ -84,8 +85,11 @@ class OrderController {
    * @param {View} ctx.view
    */
   async show({ params, request, response, view }) {
-    const order = await Order.findOrFail(params.id)
-    await order.load('products')
+    const order = await Order.query()
+      .where({ id: params.id })
+      .with('products')
+      .limit(1)
+      .fetch()
     return order
   }
 

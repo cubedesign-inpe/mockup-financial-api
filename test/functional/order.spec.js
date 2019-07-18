@@ -48,9 +48,11 @@ test('can get order detail', async ({ client, assert }) => {
     .loginVia(user, 'jwt')
     .end()
   response.assertStatus(200)
-  response.assertJSONSubset({
-    team_id: order.team_id,
-  })
+  response.assertJSONSubset([
+    {
+      team_id: order.team_id,
+    },
+  ])
 })
 
 test('can delete an order', async ({ client, assert }) => {
@@ -102,13 +104,18 @@ test('can create order from products', async ({ client, assert }) => {
     .send(shoppingCart)
     .loginVia(user, 'jwt')
     .end()
-  console.log('Error', response.error)
   response.assertStatus(200)
   const createdOrder = await Order.findBy('id', response.body.id)
-  const expectedTotal = products.reduce((acc, _) => acc + _.base_price, 0)
+  const expectedTotal = products.reduce((agg, _) => {
+    const productCart = shoppingCart.products.find(p => p.id == _.id)
+    return (
+      agg + _.base_price * shoppingCart.price_penalty * productCart.quantity
+    )
+  }, 0)
   response.assertJSONSubset({
     price_penalty: createdOrder.price_penalty,
     total: expectedTotal,
+    created_by: user.id,
   })
   assert.equal(
     expectedTotal,
@@ -139,9 +146,16 @@ test('can get order with bought products', async ({ client, assert }) => {
     .get(`teams/${team.id}/orders/${response.body.id}`)
     .loginVia(user, 'jwt')
     .end()
-  console.log('Error', response.error)
   showCartResponse.assertStatus(200)
-  showCartResponse.assertJSONSubset({
-    products: null,
-  })
+  showCartResponse.assertJSONSubset([
+    {
+      created_by: user.id,
+      products: [
+        {
+          id: cartProducts[0].id,
+          pivot: { quantity: cartProducts[0].quantity },
+        },
+      ],
+    },
+  ])
 })

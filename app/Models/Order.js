@@ -10,9 +10,9 @@ class Order extends BaseModel {
     return this.belongsTo('App/Models/Transaction')
   }
   products() {
-    return this.belongsToMany('App/Models/Product').pivotModel(
-      'App/Models/OrderProduct'
-    )
+    return this.belongsToMany('App/Models/Product')
+      .pivotModel('App/Models/OrderProduct')
+      .withPivot(['quantity'])
   }
 }
 
