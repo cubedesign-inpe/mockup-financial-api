@@ -20,6 +20,8 @@ class OrderProductSchema extends Schema {
         .unsigned()
         .references('id')
         .inTable('products')
+        .onDelete('CASCADE')
+        .notNullable()
       table.integer('quantity').notNullable()
     })
   }
