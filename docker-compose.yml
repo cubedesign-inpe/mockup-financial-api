@@ -3,7 +3,7 @@ services:
   pg-data:
     image: postgres:latest
     ports:
-      - "3306:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - mockup-financial-db:/data/db
     environment:
@@ -12,4 +12,4 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
 volumes:
   mockup-financial-db:
-    driver: "local"
+    driver: 'local'

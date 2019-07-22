@@ -8,8 +8,10 @@ cache:
   directories:
     - '$HOME/.npm'
 before_script:
-  - docker-compose up -d
+  - cp .env.testing .env
+  - docker-compose up --build -d
 install:
   - npm ci
 after_script:
+  - docker-compose down
   - npm run coverage
