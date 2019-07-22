@@ -12,7 +12,8 @@ install:
 before_script:
   - cp .env.testing .env
   - docker-compose up --build -d
-  - npm run key:generate
+  - npm i -g adonis
+  - adonis key:generate
 after_script:
   - npm run coverage
   - docker-compose down
