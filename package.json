@@ -8,8 +8,8 @@
     "start": "node server.js",
     "lint": "eslint .",
     "pretest": "npm run lint",
-    "test": "adonis test",
-    "test:watch": "adonis test",
+    "test": "node ace test",
+    "test:watch": "node ace test",
     "coverage": "nyc npm run test"
   },
   "keywords": [

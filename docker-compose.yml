@@ -3,7 +3,7 @@ services:
   pg-data:
     image: postgres:latest
     ports:
-      - "${DB_PORT}:5432"
+      - '${DB_PORT}:5432'
     volumes:
       - mockup-financial-db:/data/db
     environment:
