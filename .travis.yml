@@ -12,6 +12,7 @@ before_script:
   - docker-compose up --build -d
 install:
   - npm ci
+  - npm run key:generate
 after_script:
-  - docker-compose down
   - npm run coverage
+  - docker-compose down

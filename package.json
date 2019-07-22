@@ -10,13 +10,10 @@
     "pretest": "npm run lint",
     "test": "node ace test",
     "test:watch": "node ace test",
-    "coverage": "nyc npm run test"
+    "coverage": "nyc npm run test",
+    "key:generate": "node ace key:generate"
   },
-  "keywords": [
-    "api",
-    "adonisjs",
-    "adonis-app"
-  ],
+  "keywords": ["api", "adonisjs", "adonis-app"],
   "author": "Yuri-M-Dias",
   "license": "MIT",
   "private": true,
