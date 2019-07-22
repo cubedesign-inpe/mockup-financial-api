@@ -5,6 +5,7 @@ const Factory = use('Factory')
 const Database = use('Database')
 
 const Logger = use('Logger')
+const User = use('App/Models/User')
 
 class UserSeeder {
   async run() {
@@ -13,7 +14,14 @@ class UserSeeder {
       email: 'cube@inpe.br',
       password: 'cubedesign',
     })
-    const users = await Database.table('users')
+    const adminUser = {
+      username: 'cubedesign',
+      full_name: 'CubeDesign',
+      email: 'cubedesign@inpe.br',
+      password: 'cubedesign',
+    }
+    const user = await User.create(adminUser)
+    Logger.info(`Created user ${user.email}`)
   }
 }
 

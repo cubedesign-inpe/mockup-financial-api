@@ -24,6 +24,7 @@ Route.resource('users', 'UserController')
   */
 
 Route.group(() => {
+  Route.delete('/sessions', 'SessionController.revokeUserToken')
   Route.resource('teams', 'TeamController').apiOnly()
   Route.resource('/teams/:team_id/orders', 'OrderController')
     .validator(

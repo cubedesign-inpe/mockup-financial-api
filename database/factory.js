@@ -5,12 +5,11 @@ const Factory = use('Factory')
 const Hash = use('Hash')
 
 Factory.blueprint('App/Models/User', async (faker, i, data) => {
-  const tmpPassword = data.password || faker.password()
   return {
     username: faker.username(),
     full_name: faker.name(),
     email: data.email || faker.email(),
-    password: await Hash.make(tmpPassword),
+    password: data.password || faker.password(),
   }
 })
 
