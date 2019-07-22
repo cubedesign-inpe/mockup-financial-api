@@ -7,11 +7,11 @@ sudo: false
 cache:
   directories:
     - '$HOME/.npm'
+install:
+  - npm ci
 before_script:
   - cp .env.testing .env
   - docker-compose up --build -d
-install:
-  - npm ci
   - npm run key:generate
 after_script:
   - npm run coverage
