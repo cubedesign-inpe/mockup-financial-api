@@ -37,14 +37,25 @@ Factory.blueprint('App/Models/Order', async (faker, i, data) => {
 
 Factory.blueprint('App/Models/OrderProduct', async (faker, i, data) => {
   return {
-    team_id: data.team_id,
     order_id: data.order_id,
+    product_id: data.product_id,
     quantity: faker.integer({ min: 1, max: 20 }),
   }
 })
+
 Factory.blueprint('App/Models/Transaction', async (faker, i, data) => {
   return {
     team_id: data.team_id,
     delta: faker.integer({ min: -50, max: 100 }),
+  }
+})
+
+Factory.blueprint('App/Models/Observation', async (faker, i, data) => {
+  return {
+    team_id: data.team_id,
+    observation: JSON.stringify({
+      type: 'Mockup',
+      data: [[1, 50], [2, 40], [3, 30], [4, 20]],
+    }),
   }
 })

@@ -38,6 +38,10 @@ Route.group(() => {
     '/teams/:team_id/transactions',
     'TransactionController'
   ).apiOnly()
+  Route.resource(
+    '/teams/:team_id/observations',
+    'ObservationController'
+  ).apiOnly()
   Route.resource('products', 'ProductController').apiOnly()
 })
   .formats(['json'])

@@ -9,8 +9,8 @@ class Order {
   }
   get messages() {
     return {
-      'price_penalty.required': 'You must provide a price penalty.',
-      'products.required': 'You must provide the products.',
+      'price_penalty.required': 'Você precisa da penalidade',
+      'products.required': 'Você precisa enviar algum produto',
     }
   }
   get validateAll() {

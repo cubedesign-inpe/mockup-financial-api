@@ -8,6 +8,8 @@ const Order = use('App/Models/Order')
 const Team = use('App/Models/Team')
 const Product = use('App/Models/Product')
 const OrderProduct = use('App/Models/OrderProduct')
+const Logger = use('Logger')
+
 /**
  * Resourceful controller for interacting with orders
  */
@@ -51,13 +53,23 @@ class OrderController {
     if (products.length === 0 || products.legnth < product_ids) {
       return response
         .status(400)
-        .json({ error: 'All products must have valid ids' })
+        .json([
+          { message: 'Todos produtos devem ser válidos', field: 'products' },
+        ])
     }
     const pricePenalty = data.price_penalty
     const orderTotal = products.reduce((agg, _) => {
       const productCart = data.products.find(p => p.id == _.id)
       return agg + _.base_price * pricePenalty * productCart.quantity
     }, 0)
+    if (orderTotal > team.total) {
+      return response.status(400).json([
+        {
+          message: 'Você não tem crédito o bastante para isso!',
+          field: 'products',
+        },
+      ])
+    }
     const order = await Order.create({
       price_penalty: pricePenalty,
       total: orderTotal,
@@ -69,6 +81,7 @@ class OrderController {
       row.quantity = productDetail.quantity
     })
     team.total -= order.total
+    Logger.info(`Removed ${order.total} from team ${team_id}`)
     await team.save()
     //Service logic
     await order.load('products')
@@ -103,7 +116,10 @@ class OrderController {
    */
   async update({ params, request, response }) {
     const order = await Order.findOrFail(params.id)
-    return order
+    const data = request.only(['price_penalty'])
+    //TODO: products?
+    order.merge(data)
+    return await order.save()
   }
 
   /**
@@ -116,6 +132,12 @@ class OrderController {
    */
   async destroy({ params, request, response }) {
     const order = await Order.findOrFail(params.id)
+    const { team_id } = params
+    //Gives the total back
+    const team = await Team.findOrFail(team_id)
+    team.total += order.total
+    await team.save()
+    Logger.info(`Giving back ${order.total} to team ${team_id}`)
     return await order.delete()
   }
 }

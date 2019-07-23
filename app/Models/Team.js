@@ -9,6 +9,9 @@ class Team extends BaseModel {
   transactions() {
     return this.hasMany('App/Models/Transaction')
   }
+  observations() {
+    return this.hasMany('App/Models/Observation')
+  }
 }
 
 module.exports = Team
